@@ -61,7 +61,7 @@ git+git://github.com/mwieler/django-registration-1.5.git#egg=django-registration
 requests==0.11.1
 
 # Scraping
-git+git://github.com/fgregg/legistar-scrape#egg=legistar-scrape
+git+git://github.com/fgregg/legistar-scrape@5f04ebe7#egg=legistar-scrape
 BeautifulSoup
 BeautifulSoup4
 pdfminer
