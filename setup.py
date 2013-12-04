@@ -84,7 +84,7 @@ install_requires = [
 # ====================
 
 # Requests, for talking HTTP to things like Google's geocoder
-'requests==0.11.1',
+'requests==2.0.1',
 
 # Scraping
 'legistar-scrape==0.1',
