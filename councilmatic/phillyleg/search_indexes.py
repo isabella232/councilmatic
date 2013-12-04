@@ -27,7 +27,7 @@ class LegislationIndex(indexes.SearchIndex, indexes.Indexable):
         )
 
     def prepare_topics(self, leg):
-	return [topic.topic for topic in leg.metadata.topics.all()]
+        return [topic.topic for topic in leg.metadata.topics.all()]
 
     def get_updated_field(self):
         return 'updated_datetime'
