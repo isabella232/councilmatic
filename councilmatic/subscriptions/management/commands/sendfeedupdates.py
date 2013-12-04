@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from subscriptions.feeds import import_all_feeds
-from subscriptions.feeds import SubscriptionEmailer
-from subscriptions.models import Subscriber
+from councilmatic.subscriptions.feeds import import_all_feeds
+from councilmatic.subscriptions.feeds import SubscriptionEmailer
+from councilmatic.subscriptions.models import Subscriber
 
 class Command(BaseCommand):
     help = "Send a digest of the new items in the users' subscription lists."

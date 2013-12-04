@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from subscriptions.feeds import ContentFeedRecordCleaner
+from councilmatic.subscriptions.feeds import ContentFeedRecordCleaner
 
 
 class Command(BaseCommand):

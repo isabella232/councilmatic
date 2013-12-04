@@ -4,7 +4,7 @@ from djangorestframework.reverse import reverse
 from djangorestframework import resources
 from .forms import SubscriberForm
 
-from subscriptions.models import (Subscriber, Subscription)
+from councilmatic.subscriptions.models import (Subscriber, Subscription)
 from bookmarks.models import Bookmark
 from phillyleg.models import (CouncilDistrict, CouncilDistrictPlan,
                               CouncilMember, LegFile)

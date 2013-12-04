@@ -5,9 +5,9 @@ from django import http
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 
-import subscriptions.feeds as feeds
-import subscriptions.forms as forms
-import subscriptions.models as models
+import councilmatic.subscriptions.feeds as feeds
+import councilmatic.subscriptions.forms as forms
+import councilmatic.subscriptions.models as models
 
 from utils.decorators import LoginRequired
 

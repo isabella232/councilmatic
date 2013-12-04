@@ -1,5 +1,5 @@
 from django import template
-from subscriptions.feeds import ContentFeedLibrary
+from councilmatic.subscriptions.feeds import ContentFeedLibrary
 
 register = template.Library()
 

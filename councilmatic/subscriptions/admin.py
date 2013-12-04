@@ -1,5 +1,5 @@
 from django.contrib import admin
-from subscriptions import models
+from councilmatic.subscriptions import models
 
 #class KeywordInline(admin.StackedInline):
 #    model = KeywordSubscription

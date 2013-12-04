@@ -10,18 +10,18 @@ from logging import CRITICAL, DEBUG, ERROR, INFO, WARN
 from mock import Mock
 from nose.tools import *
 
-from subscriptions.feeds import ContentFeed
-from subscriptions.feeds import ContentFeedLibrary
-from subscriptions.feeds import ContentFeedRecordCleaner
-from subscriptions.feeds import ContentFeedRecordUpdater
-from subscriptions.feeds import SubscriptionDispatcher
-from subscriptions.forms import SubscriptionForm
-from subscriptions.models import ContentFeedParameter
-from subscriptions.models import ContentFeedRecord
-from subscriptions.models import Subscriber
-from subscriptions.models import Subscription
-from subscriptions.models import SerializedObjectField
-from subscriptions.views import SingleSubscriptionMixin
+from councilmatic.subscriptions.feeds import ContentFeed
+from councilmatic.subscriptions.feeds import ContentFeedLibrary
+from councilmatic.subscriptions.feeds import ContentFeedRecordCleaner
+from councilmatic.subscriptions.feeds import ContentFeedRecordUpdater
+from councilmatic.subscriptions.feeds import SubscriptionDispatcher
+from councilmatic.subscriptions.forms import SubscriptionForm
+from councilmatic.subscriptions.models import ContentFeedParameter
+from councilmatic.subscriptions.models import ContentFeedRecord
+from councilmatic.subscriptions.models import Subscriber
+from councilmatic.subscriptions.models import Subscription
+from councilmatic.subscriptions.models import SerializedObjectField
+from councilmatic.subscriptions.views import SingleSubscriptionMixin
 
 # Models
 

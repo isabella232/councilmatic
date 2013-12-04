@@ -1,11 +1,11 @@
 import datetime
 from django.core import mail
 from nose.tools import *
-from subscriptions.feeds import ContentFeed
-from subscriptions.feeds import ContentFeedLibrary
-from subscriptions.management.commands import sendfeedupdates
-from subscriptions.management.commands import updatefeeds
-from subscriptions.models import Subscriber, ContentFeedRecord
+from councilmatic.subscriptions.feeds import ContentFeed
+from councilmatic.subscriptions.feeds import ContentFeedLibrary
+from councilmatic.subscriptions.management.commands import sendfeedupdates
+from councilmatic.subscriptions.management.commands import updatefeeds
+from councilmatic.subscriptions.models import Subscriber, ContentFeedRecord
 
 
 @istest

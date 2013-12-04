@@ -3,7 +3,7 @@ from nose.tools import *
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from subscriptions.models import Subscriber
+from councilmatic.subscriptions.models import Subscriber
 
 class TestSubscriberPermissions:
 

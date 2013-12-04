@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from subscriptions.feeds import import_all_feeds
-from subscriptions.feeds import ContentFeedRecordUpdater
-from subscriptions.models import ContentFeedRecord
+from councilmatic.subscriptions.feeds import import_all_feeds
+from councilmatic.subscriptions.feeds import ContentFeedRecordUpdater
+from councilmatic.subscriptions.models import ContentFeedRecord
 
 
 class Command(BaseCommand):

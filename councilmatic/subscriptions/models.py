@@ -9,7 +9,7 @@ from django.db import transaction, DatabaseError, IntegrityError
 from django.utils.translation import ugettext as _
 import haystack.query as haystack
 
-from subscriptions.fields import SerializedObjectField
+from councilmatic.subscriptions.fields import SerializedObjectField
 
 log = logging.getLogger(__name__)
 

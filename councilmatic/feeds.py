@@ -6,8 +6,8 @@ from itertools import chain
 from itertools import product
 from urllib import urlencode
 
-from subscriptions.feeds import ContentFeed
-from subscriptions.feeds import ContentFeedLibrary
+from councilmatic.subscriptions.feeds import ContentFeed
+from councilmatic.subscriptions.feeds import ContentFeedLibrary
 from phillyleg.models import LegFile
 from phillyleg.models import LegMinutes
 from haystack.query import SearchQuerySet
@@ -95,7 +95,7 @@ class LegislationUpdatesFeed (ContentFeed):
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from subscriptions.models import Subscriber
+from councilmatic.subscriptions.models import Subscriber
 
 @receiver(post_save, sender=Subscriber)
 def create_bookmarks_subscription_for_subscriber(sender, **kwargs):
