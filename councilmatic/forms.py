@@ -15,8 +15,8 @@ def legfile_choices(field):
 
 def councilmember_choices():
     from phillyleg.models import CouncilMember
-    values = [(member.name, member.name)
-              for member in CouncilMember.objects.all().order_by('name')]
+    values = [(member.real_name, member.real_name)
+              for member in CouncilMember.objects.all().order_by('real_name')]
     return values
 
 def topic_choices():

@@ -153,17 +153,17 @@ class CouncilMembersView(views.TemplateView):
     def get_councilmembers(self):
         return phillyleg.models.CouncilMember.objects.\
                filter(title__icontains='alderman').\
-               exclude(title__icontains='former').order_by('name')
+               exclude(title__icontains='former').order_by('real_name')
 
     def get_former_councilmembers(self):
         return phillyleg.models.CouncilMember.objects.\
                filter(title__icontains='former').\
-               order_by('name')
+               order_by('real_name')
 
     def get_other_councilmembers(self):
         return phillyleg.models.CouncilMember.objects.\
                exclude(title__icontains='former').exclude(title__icontains='alderman').\
-               order_by('name')
+               order_by('real_name')
 
 
     def get_context_data(self, **kwargs):
@@ -355,8 +355,8 @@ class SearchView (SearcherMixin,
         context['file_types'] = get_or_cache('search_file_types',
             lambda: legfile_choices('type'))
         context['sponsors'] = get_or_cache('search_sponsors',
-            lambda: [(member.name, member.name)
-                     for member in CouncilMember.objects.all().order_by('name')])
+            lambda: [(member.real_name, member.real_name)
+                     for member in CouncilMember.objects.all().order_by('real_name')])
         
         log.debug(context)
         return context

@@ -101,7 +101,7 @@ class CouncilmaticDataStoreWrapper (object):
         changed = self.has_text_changed(legfile.key, legfile)
         legfile.save(update_words=changed, update_mentions=changed, update_locations=changed)
 
-        existing_sponsors = legfile.sponsors.all()
+        existing_sponsors = legfile.sponsors.all().prefetch_related('aliases')
         existing_topics = legfile.metadata.topics.all()
 
         if isinstance(sponsor_names, basestring):
@@ -113,7 +113,11 @@ class CouncilmaticDataStoreWrapper (object):
             if sponsor_name is None or len(sponsor_name) == 0:
                 continue
 
-            sponsor, created = CouncilMember.objects.get_or_create(name=sponsor_name)
+            try:
+                sponsor = CouncilMember.objects.get(aliases__name=sponsor_name)
+            except CouncilMember.DoesNotExist:
+                sponsor = CouncilMember.objects.create(real_name=sponsor_name)
+                alias = CouncilMemberAlias.objects.create(member=sponsor, name=sponsor_name)
 
             # Add the legislation to the sponsor and save, instead of the other
             # way around, because saving legislation can be expensive.

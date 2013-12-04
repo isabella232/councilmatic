@@ -9,6 +9,7 @@ from django.contrib.gis import geos
 #from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 from phillyleg.management.scraper_wrappers import PhillyLegistarSiteWrapper
 from utils.models import TimestampedModelMixin
 
@@ -26,12 +27,21 @@ class LegKeys(models.Model):
 # Legislative File models
 #
 
+class CouncilMemberAlias (models.Model):
+    member = models.ForeignKey('CouncilMember', related_name='aliases')
+    name = models.CharField(max_length=100, help_text=_('A name by which the council member is referred to in legislation'))
+
+    def __unicode__(self):
+        return self.name
+
+
 class CouncilMember(TimestampedModelMixin, models.Model):
-    name = models.CharField(max_length=100)
-    title = models.CharField(max_length=255, default='')
+    real_name = models.CharField(max_length=100, help_text=_('The council member\'s real name'))
+    title = models.CharField(max_length=255, default='', blank=True)
     headshot = models.CharField(max_length=255,
         # Path to councilmember image, relative to static files dir
-        default='phillyleg/noun_project_416.png')
+        default='phillyleg/noun_project_416.png',
+        help_text=_('Path to the image of the councilmember, relative to the static folder'))
     districts = models.ManyToManyField('CouncilDistrict', through='CouncilMemberTenure', related_name='representatives')
 
     NOT_YET_SET = object()
@@ -70,7 +80,7 @@ class CouncilMember(TimestampedModelMixin, models.Model):
         return (tenure is not None and tenure.at_large)
 
     def __unicode__(self):
-        return self.name.lstrip("Councilmember")
+        return self.real_name.lstrip("Councilmember")
 
 
 class CouncilMemberTenure(TimestampedModelMixin, models.Model):

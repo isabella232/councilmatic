@@ -1,6 +1,9 @@
 from django.contrib.gis import admin
 from django.db.models import Max
+from django.utils.translation import ugettext_lazy
 from phillyleg.models import *
+
+
 
 class LegActionInline(admin.StackedInline):
     model = LegAction
@@ -44,9 +47,13 @@ class CouncilMemberTenureInline (admin.TabularInline):
     model = CouncilMemberTenure
     extra = 1
 
+class CouncilMemberAliasInline (admin.TabularInline):
+    model = CouncilMemberAlias
+    extra = 1
+
 class CouncilMemberAdmin (admin.ModelAdmin):
-    inlines = [CouncilMemberTenureInline]
-    list_display = ('name', 'tenure_begin')
+    inlines = [CouncilMemberAliasInline, CouncilMemberTenureInline]
+    list_display = ('real_name', 'tenure_begin')
 
     def queryset(self, request):
         qs = super(CouncilMemberAdmin, self).queryset(request)
@@ -57,6 +64,59 @@ class CouncilMemberAdmin (admin.ModelAdmin):
         return instance.tenure_begin
     tenure_begin.short_description = 'Began tenure...'
 
+    def get_merge_form(self, members):
+        class MergeCouncilMemberForm (django.forms.Form):
+            primary = django.forms.ModelChoiceField(queryset=members)
+            members = django.forms.ModelMultipleChoiceField(queryset=members)
+
+            def merge(self):
+                seen_aliases = [alias.name for alias in primary.aliases.all()]
+                for member in self.members.all():
+                    for alias in member.aliases.all():
+                        if alias.name not in seen_aliases:
+                            seen_aliases.add(alias.name)
+                            alias.member = self.primary
+                            alias.save()
+
+                    for tenure in member.tenures.all():
+                        tenure.member = self.primary
+                        tenure.save()
+
+                    for legislation in member.legislation.all():
+                        legislation.sponsors.remove(member)
+                        legislation.sponsors.add(self.primary)
+
+                    for vote in member.votes.all():
+                        vote.voter = self.primary
+                        vote.save()
+
+                    member.delete()
+
+    def merge_members(self, request, members):
+        opts = CouncilMember._meta
+        app_label = opts.app_label
+
+        if request.POST.get('post'):
+            # Do the merge
+            # Return None to display the change list page again.
+            return None
+
+        if len(queryset) == 1:
+            objects_name = force_text(opts.verbose_name)
+        else:
+            objects_name = force_text(opts.verbose_name_plural)
+
+        context = {
+            "title": title,
+            "queryset": queryset,
+            "opts": opts,
+            "app_label": app_label,
+            "form": self.get_merge_form()
+        }
+
+        # Display the confirmation page
+        render(request, 'admin/merge_councilmembers_form.html', context)
+    merge_members.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")
 
 
 admin.site.register(LegFile, LegFileAdmin)
