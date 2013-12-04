@@ -283,7 +283,7 @@ class LegFile(TimestampedModelMixin, models.Model):
                 for location in locations:
                     try:
                         md_location = MetaData_Location.objects.get_or_create(
-                            address=location[0]
+                            matched_text=location[0]
                         )[0]
                     except MetaData_Location.CouldNotBeGeocoded:
                         continue
@@ -427,7 +427,7 @@ class LegMinutes(TimestampedModelMixin, models.Model):
             locations = self.addresses()
             for location in locations:
                 md_location = MetaData_Location.objects.get_or_create(
-                    address=location['address']
+                    matched_text=location['address']
                 )[0]
                 metadata.locations.add(md_location)
 
