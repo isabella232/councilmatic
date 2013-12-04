@@ -4,6 +4,7 @@ import re
 import utils
 import logging
 from django.conf import settings
+from django.db import transaction
 from django.contrib.gis.db import models
 from django.contrib.gis import geos
 #from django.db import models
@@ -258,46 +259,56 @@ class LegFile(TimestampedModelMixin, models.Model):
         metadata for the legislative file as well.
 
         """
-        super(LegFile, self).save(*args, **kwargs)
+        try:
+            # We don't want the legfile to be saved without its metadata, so
+            # wrap this whole thing in a transaction.
+            sid = transaction.savepoint()
 
-        metadata = LegFileMetaData.objects.get_or_create(legfile=self)[0]
+            super(LegFile, self).save(*args, **kwargs)
 
-        if update_words:
-            # Add the unique words to the metadata
-            metadata.words.clear()
-            unique_words = self.unique_words()
-            for word in unique_words:
-                md_word = MetaData_Word.objects.get_or_create(value=word)[0]
-                metadata.words.add(md_word)
+            metadata = LegFileMetaData.objects.get_or_create(legfile=self)[0]
 
-        if update_locations:
-            # Add the unique locations to the metadata
-            metadata.locations.clear()
-            locations = self.addresses()
-            for location in locations:
-                try:
-                    md_location = MetaData_Location.objects.get_or_create(
-                        address=location[0]
-                    )[0]
-                except MetaData_Location.CouldNotBeGeocoded:
-                    continue
+            if update_words:
+                # Add the unique words to the metadata
+                metadata.words.clear()
+                unique_words = self.unique_words()
+                for word in unique_words:
+                    md_word = MetaData_Word.objects.get_or_create(value=word)[0]
+                    metadata.words.add(md_word)
 
-                metadata.locations.add(md_location)
+            if update_locations:
+                # Add the unique locations to the metadata
+                metadata.locations.clear()
+                locations = self.addresses()
+                for location in locations:
+                    try:
+                        md_location = MetaData_Location.objects.get_or_create(
+                            address=location[0]
+                        )[0]
+                    except MetaData_Location.CouldNotBeGeocoded:
+                        continue
 
-        if update_mentions:
-            # Add the mentioned files to the metadata
-            metadata.mentioned_legfiles.clear()
-            for mentioned_legfile in self.mentioned_legfiles():
-                metadata.mentioned_legfiles.add(mentioned_legfile)
+                    metadata.locations.add(md_location)
 
-        if update_topics:
-            # Add topics to the metadata
-            metadata.topics.clear()
-            for topic in self.topics():
-                t = MetaData_Topic.objects.get_or_create(topic=topic)[0]
-                metadata.topics.add(t)
+            if update_mentions:
+                # Add the mentioned files to the metadata
+                metadata.mentioned_legfiles.clear()
+                for mentioned_legfile in self.mentioned_legfiles():
+                    metadata.mentioned_legfiles.add(mentioned_legfile)
 
-        metadata.save()
+            if update_topics:
+                # Add topics to the metadata
+                metadata.topics.clear()
+                for topic in self.topics():
+                    t = MetaData_Topic.objects.get_or_create(topic=topic)[0]
+                    metadata.topics.add(t)
+
+            metadata.save()
+
+            transaction.savepoint_commit(sid)
+        except:
+            transaction.savepoint_rollback(sid)
+            raise
 
     def get_data_source(self):
         return PhillyLegistarSiteWrapper()
