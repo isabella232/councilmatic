@@ -58,7 +58,7 @@ git+git://github.com/mwieler/django-registration-1.5.git#egg=django-registration
 # ====================
 
 # Requests, for talking HTTP to things like Google's geocoder
-requests==0.11.1
+requests==2.0.1
 
 # Scraping
 git+git://github.com/fgregg/legistar-scrape@5f04ebe7#egg=legistar-scrape
