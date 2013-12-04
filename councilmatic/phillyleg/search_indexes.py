@@ -1,4 +1,5 @@
 import datetime
+from itertools import chain
 from haystack import indexes
 from phillyleg.models import LegFile, LegMinutes
 
@@ -20,7 +21,10 @@ class LegislationIndex(indexes.SearchIndex, indexes.Indexable):
         return LegFile
 
     def prepare_sponsors(self, leg):
-        return [sponsor.name for sponsor in leg.sponsors.all()]
+        return (
+            [sponsor.real_name for sponsor in leg.sponsors.all()] +
+            [alias.name for alias in chain(*(sponsor.aliases.all() for sponsor in leg.sponsors.all()))]
+        )
 
     def prepare_topics(self, leg):
 	return [topic.topic for topic in leg.metadata.topics.all()]
