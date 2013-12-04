@@ -122,8 +122,15 @@ class CouncilmaticDataStoreWrapper (object):
             # Add the legislation to the sponsor and save, instead of the other
             # way around, because saving legislation can be expensive.
             if sponsor not in existing_sponsors :
-                sponsor.legislation.add(legfile)
-                sponsor.save()
+                try:
+                    sid = transaction.savepoint()
+                    sponsor.legislation.add(legfile)
+                    sponsor.save()
+                    transaction.savepoint_commit(sid)
+                except IntegrityError:
+                    # If by some fluke we still end up inserting a duplicate,
+                    # handle gracefully.
+                    transaction.savepoint_rollback(sid)
 
         for topic_name in topic_names:
             topic, created = MetaData_Topic.objects.get_or_create(topic=topic_name)
