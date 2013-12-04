@@ -15,6 +15,14 @@ class LegFileAttachmentInline(admin.StackedInline):
 
 class LegFileAdmin(admin.ModelAdmin):
     inlines = [LegActionInline, LegFileAttachmentInline]
+    readonly_fields = ['locations']
+
+    def locations(self, instance):
+        return ','.join(['<a href="%s">%s</a>' % (
+            reverse("admin:phillyleg_metadata_location_change", args=(loc.id,)) , str(loc))
+            for loc in instance.metadata.locations.all()])
+    locations.allow_tags = True
+    locations.short_description = 'Locations mentioned'
 
 class LegMinutesAdmin(admin.ModelAdmin):
     inlines = [LegActionInline]
@@ -34,7 +42,16 @@ class WordAdmin (admin.ModelAdmin):
 
 class LocationAdmin (admin.OSMGeoAdmin):
     model = MetaData_Location
-    search_fields = ['address']
+    list_display = ['__unicode__', 'valid']
+    search_fields = ['matched_text', 'address']
+    readonly_fields = ['legfiles']
+
+    def legfiles(self, instance):
+        return ','.join(['<a href="%s">%s</a>' % (
+            reverse("admin:phillyleg_legfile_change", args=(m.legfile.key,)) , str(m.legfile))
+            for m in instance.references_in_legislation.all()])
+    legfiles.allow_tags = True
+    legfiles.short_description = 'References in legislation'
 
 class CouncilDistrictInline(admin.TabularInline):
     model = CouncilDistrict
