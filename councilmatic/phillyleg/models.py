@@ -470,14 +470,15 @@ class MetaData_Word (models.Model):
 
 
 class MetaData_Location (TimestampedModelMixin, models.Model):
-    address = models.CharField(max_length=2048, unique=True)
+    matched_text = models.CharField(max_length=2048, unique=True)
+    address = models.CharField(max_length=2048, default='')
     geom = models.PointField(null=True)
     valid = models.BooleanField(default=True, blank=True)
 
     objects = models.GeoManager()
 
     def __unicode__(self):
-        return '{0}{1}'.format(self.address, settings.LEGISLATION['ADDRESS_SUFFIX'])
+        return '{0} ({1})'.format(self.matched_text, self.address)
 
     def save(self, *args, **kwargs):
         if not self.id and not self.geom:
@@ -489,15 +490,16 @@ class MetaData_Location (TimestampedModelMixin, models.Model):
         pass
 
     def geocode(self):
-        gc = utils.geocode(self.address, settings.LEGISLATION['ADDRESS_BOUNDS'])
+        gc = utils.geocode(self.matched_text, settings.LEGISLATION['ADDRESS_BOUNDS'])
 
         if gc and gc['status'] == 'OK' and settings.LEGISLATION['ADDRESS_SUFFIX'] in gc['results'][0]['formatted_address']:
+            self.address = gc['results'][0]['formatted_address']
             x = float(gc['results'][0]['geometry']['location']['lng'])
             y = float(gc['results'][0]['geometry']['location']['lat'])
             self.geom = geos.Point(x, y)
         else:
-            log.debug('Could not geocode the address "%s"' % self.address)
-            raise self.CouldNotBeGeocoded(self.address)
+            log.debug('Could not geocode the address "%s"' % self.matched_text)
+            raise self.CouldNotBeGeocoded(self.matched_text)
 
 class MetaData_Topic (models.Model):
     topic = models.CharField(max_length=128, unique=True)
