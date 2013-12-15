@@ -237,7 +237,8 @@ class SearcherMixin (object):
             def __init__(self, sqs):
                 self.sqs = sqs
             def __len__(self):
-                return len(self.sqs)
+                return self.sqs.count()
+            count = __len__
             def __iter__(self):
                 return (result.object for result in self.sqs.load_all())
             def __getitem__(self, key):
