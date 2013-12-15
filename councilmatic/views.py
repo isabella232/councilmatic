@@ -1,5 +1,6 @@
 import json
 import logging as log
+from collections import defaultdict, namedtuple
 from django.contrib.syndication.views import Feed as DjangoFeed
 from django.shortcuts import get_object_or_404
 from django.views import generic as views
@@ -211,11 +212,7 @@ class CouncilMemberDetailView (BaseDashboardMixin,
 
 class SearcherMixin (object):
     def get_search_queryset(self):
-        return RelatedSearchQuerySet().load_all_queryset(
-            phillyleg.models.LegFile,
-            phillyleg.models.LegFile.objects\
-                .exclude(title='')\
-                .prefetch_related('sponsors', 'metadata__topics', 'metadata__locations'))
+        return SearchQuerySet().exclude(is_blank=True)
 
     def _init_haystack_searchview(self, request):
         # Construct and run a haystack SearchView so that we can use the
@@ -243,7 +240,32 @@ class SearcherMixin (object):
                 return (result.object for result in self.sqs.load_all())
             def __getitem__(self, key):
                 if isinstance(key, slice):
-                    return [result.object for result in self.sqs.load_all()[key] if result is not None]
+                    # Collect all the results in the slice, storing the id
+                    # and the model of the object.
+                    ResultSummary = namedtuple('ResultSummary', 'model id')
+                    results = [ResultSummary(result.model, str(result.file_id)) for result in
+                               self.sqs[key] if result is not None]
+
+                    # For each model, do a query for the objects of that model
+                    # type and map them by key.
+                    models = set([result.model for result in results])
+                    objs_by_id = {}
+                    for model in models:
+                        ids = [result.id for result in results if result.model is model]
+                        objs = model.objects.filter(id__in=ids)\
+                            .select_related('metadata')\
+                            .prefetch_related('metadata__topics')\
+                            .prefetch_related('metadata__locations')
+                        objs_by_id.update(
+                            {str(obj.id): obj for obj in objs}
+                        )
+
+                    # To preserve search query order, pull the objects out of
+                    # the map according to the order of the results.
+                    try:
+                        return [objs_by_id[result.id] for result in results]
+                    except:
+                        import pdb; pdb.set_trace()
                 else:
                     return self.sqs[key].object
 
