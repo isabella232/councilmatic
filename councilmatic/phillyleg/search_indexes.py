@@ -22,8 +22,8 @@ class LegislationIndex(indexes.SearchIndex, indexes.Indexable):
         return LegFile
 
     def prepare_is_blank(self, leg):
-        return leg.title.strip() == ''
-    
+        return not (leg.title and leg.title.strip())
+
     def prepare_sponsors(self, leg):
         return (
             [sponsor.real_name for sponsor in leg.sponsors.all()] +

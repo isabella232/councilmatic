@@ -212,18 +212,26 @@ class CouncilMemberDetailView (BaseDashboardMixin,
 
 class SearcherMixin (object):
     def get_search_queryset(self):
-        return SearchQuerySet().exclude(is_blank=True)
+        return SearchQuerySet()
 
-    def _init_haystack_searchview(self, request):
-        # Construct and run a haystack SearchView so that we can use the
+    def get_search_form_class(self):
+        return forms.FullSearchForm
+
+    def get_search_form(self, request):
+        FormClass = self.get_search_form_class()
+        qs = self.get_search_queryset()
+
+        data = request.GET
+
+        return FormClass(data, searchqueryset=qs, load_all=False)
+
+    def _init_haystack_search(self, request):
+        # Construct and run a haystack SearchForm so that we can use the
         # resulting values.
-        self.search_queryset = self.get_search_queryset()
-        self.search_view = haystack.views.SearchView(form_class=forms.FullSearchForm, searchqueryset=self.search_queryset)
-        self.search_view.request = request
 
-        self.search_view.form = self.search_view.build_form()
-        self.search_view.query = self.search_view.get_query()
-        self.search_view.results = self.search_view.get_results().order_by('-order_date')
+        # TODO: Check is_valid
+        self.form = self.get_search_form(request)
+        self.results = self.form.search().exclude(is_blank=True).order_by('-order_date')
 
     def _get_search_results(self, query_params):
         class SQSProxy (object):
@@ -266,16 +274,12 @@ class SearcherMixin (object):
                 else:
                     return self.sqs[key].object
 
-        if len(query_params) == 0:
-            search_queryset = SQSProxy(self.search_queryset)
-        else:
-            search_queryset = SQSProxy(self.search_view.results)
-        return search_queryset
+        return SQSProxy(self.results)
 
 
 class LegFileListFeedView (SearcherMixin, DjangoFeed):
     def get_object(self, request, *args, **kwargs):
-        self._init_haystack_searchview(request)
+        self._init_haystack_search(request)
         query_params = request.GET.copy()
         search_queryset = self._get_search_results(query_params)
         return search_queryset
@@ -300,7 +304,7 @@ class SearchView (SearcherMixin,
     feed_data = None
 
     def dispatch(self, request, *args, **kwargs):
-        self._init_haystack_searchview(request)
+        self._init_haystack_search(request)
         return super(SearchView, self).dispatch(request, *args, **kwargs)
 
     def get_content_feed(self):
@@ -350,7 +354,7 @@ class SearchView (SearcherMixin,
         Generates the actual HttpResponse to send back to the user.
         """
         context = super(SearchView, self).get_context_data(**kwargs)
-        context['form'] = self.search_view.form
+        context['form'] = self.form
 
         page_obj = context.get('page_obj', None)
         query_params = self.request.GET.copy()

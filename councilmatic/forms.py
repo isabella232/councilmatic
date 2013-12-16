@@ -107,8 +107,8 @@ class FullSearchForm (haystack.forms.SearchForm):
             file_types = self.cleaned_data['file_types']
             controlling_bodies = self.cleaned_data['controlling_bodies']
 
-            if not query:
-                sqs = haystack.query.SearchQuerySet().all()
+            # if not query:
+            #     sqs = haystack.query.SearchQuerySet().all()
 
             if topics:
                 sqs = sqs.filter(topics__in=topics)
