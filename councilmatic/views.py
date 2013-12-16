@@ -262,10 +262,7 @@ class SearcherMixin (object):
 
                     # To preserve search query order, pull the objects out of
                     # the map according to the order of the results.
-                    try:
-                        return [objs_by_id[result.id] for result in results]
-                    except:
-                        import pdb; pdb.set_trace()
+                    return [objs_by_id[result.id] for result in results if result.id in objs_by_id]
                 else:
                     return self.sqs[key].object
 
