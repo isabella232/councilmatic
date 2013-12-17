@@ -274,7 +274,8 @@ class SearcherMixin (object):
                 else:
                     return self.sqs[key].object
 
-        return SQSProxy(self.results)
+        objs = SQSProxy(self.results)
+        return objs
 
 
 class LegFileListFeedView (SearcherMixin, DjangoFeed):

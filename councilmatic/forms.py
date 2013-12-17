@@ -95,6 +95,9 @@ class FullSearchForm (haystack.forms.SearchForm):
         helper.form_method = 'GET'
         return helper
 
+    def no_query_found(self):
+        return self.searchqueryset.all()
+
     def search(self):
         from phillyleg.models import LegFile
         sqs = super(FullSearchForm, self).search().models(LegFile)
