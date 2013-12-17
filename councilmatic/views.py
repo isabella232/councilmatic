@@ -231,7 +231,7 @@ class SearcherMixin (object):
 
         # TODO: Check is_valid
         self.form = self.get_search_form(request)
-        self.results = self.form.search().exclude(is_blank=True).order_by('-order_date')
+        self.results = self.form.search().order_by('-order_date')
 
     def _get_search_results(self, query_params):
         class SQSProxy (object):

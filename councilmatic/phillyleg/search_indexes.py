@@ -7,7 +7,6 @@ from phillyleg.models import LegFile, LegMinutes, LegFileMetaData
 class LegislationIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
 
-    is_blank = indexes.BooleanField()
     file_id = indexes.CharField(model_attr='id')
     topics = indexes.MultiValueField()
     status = indexes.CharField(model_attr='status')
@@ -20,9 +19,6 @@ class LegislationIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return LegFile
-
-    def prepare_is_blank(self, leg):
-        return not (leg.title and leg.title.strip())
 
     def prepare_sponsors(self, leg):
         return (
