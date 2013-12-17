@@ -40,6 +40,12 @@ class LegislationIndex(indexes.SearchIndex, indexes.Indexable):
             # just going to have to accept it in this case.
             pass
 
+    def index_queryset(self, using=None):
+        return self.get_model().objects.all()\
+            .exclude(title='')\
+            .exclude(title=' ')\
+            .exclude(title=None)
+
     def get_updated_field(self):
         return 'updated_datetime'
 
