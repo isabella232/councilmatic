@@ -85,8 +85,11 @@ class BaseDashboardMixin (SearchBarMixin,
                           bookmarks.views.BaseBookmarkMixin):
 
     def get_recent_legislation(self):
-        legfiles = self.get_recent_legislation().prefetch_related('metadata__topics')
-        return list(legfiles.exclude(metadata__topics__topic='Routine').order_by('-key')[:6])
+        legfiles = self.get_recent_legislation() \
+            .exclude(metadata__topics__topic='Routine') \
+            .prefetch_related('metadata__topics') \
+            .order_by('-key')
+        return legfiles[:6]
 
     def get_context_data(self, **kwargs):
         search_form = forms.FullSearchForm()
@@ -112,7 +115,9 @@ class AppDashboardView (BaseDashboardMixin,
     template_name = 'councilmatic/dashboard.html'
 
     def get_recent_legislation(self):
-        return phillyleg.models.LegFile.objects.exclude(title='')
+        return phillyleg.models.LegFile.objects.all() \
+            .exclude(title='') \
+            .prefetch_related('metadata__topics')
 
     def get_recent_locations(self):
         return list(phillyleg.models.MetaData_Location.objects.\
@@ -153,7 +158,9 @@ class CouncilMembersView(views.TemplateView):
     template_name = 'councilmatic/councilmembers.html'
 
     def get_councilmember_groups(self):
-        cms = phillyleg.models.CouncilMember.objects.all().order_by('real_name')
+        cms = phillyleg.models.CouncilMember.objects.all() \
+            .prefetch_related('tenures') \
+            .order_by('real_name')
 
         district_cms = filter(lambda cm: cm.is_active and not cm.is_at_large, cms)
         at_large_cms = filter(lambda cm: cm.is_active and cm.is_at_large, cms)
@@ -161,7 +168,7 @@ class CouncilMembersView(views.TemplateView):
 
         return [
             (_('District'), 'district', district_cms),
-            (_('At Largs'), 'at-large', at_large_cms),
+            (_('At Large'), 'at-large', at_large_cms),
             (_('Former'), 'former', former_cms)
         ]
 
@@ -178,10 +185,12 @@ class CouncilMemberDetailView (BaseDashboardMixin,
     template_name = 'councilmatic/councilmember_detail.html'
 
     def get_content_feed(self):
-        return feeds.SearchResultsFeed(search_filter={'sponsors': [self.object.name]})
+        return feeds.SearchResultsFeed(search_filter={'sponsors': [self.object.real_name]})
 
     def get_recent_legislation(self):
-        return self.object.legislation
+        return self.object.legislation.all() \
+            .exclude(title='') \
+            .prefetch_related('metadata__topics')
 
     def get_district(self):
         return self.object.district
