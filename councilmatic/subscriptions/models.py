@@ -114,6 +114,13 @@ class Subscriber (User):
             subscription.save()
         return subscription
 
+    def preloaded_subscriptions(self, library):
+        if not hasattr(self, '_preloaded_subscriptions'):
+            self._preloaded_subscriptions = self.subscriptions.select_related() \
+                .select_related('feed_record') \
+                .prefetch_related('feed_record__feed_params')
+        return self._preloaded_subscriptions
+
     def subscription(self, feed, library=None):
         """Returns the subscription to the given content feed."""
         if library is None:
@@ -125,17 +132,19 @@ class Subscriber (User):
 
         record = library.get_record(feed)
         try:
-            subs = self.subscriptions.select_related() \
-                .filter(feed_record__feed_name=record.feed_name)
+            subs = filter(
+                lambda sub: sub.feed_record.feed_name == record.feed_name,
+                self.preloaded_subscriptions(library)
+            )
 
             if not subs:
                 log.debug('No subscription record found with the name %s' %
                           (record.feed_name,))
                 return None
 
-            other_params = list(record.feed_params.values('name', 'value'))
+            other_params = [(p.name, p.value) for p in record.feed_params.all()]
             for sub in subs:
-                self_params = list(sub.feed_record.feed_params.values('name', 'value'))
+                self_params = other_params[:]
                 log.debug('Checking parameters %r against %r' %
                           (self_params, other_params))
                 if self_params == other_params:
