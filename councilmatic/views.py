@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.views import generic as views
 from django.core.cache import cache
 from django.core.urlresolvers import reverse_lazy
+from django.utils.translation import ugettext as _
 from haystack.query import SearchQuerySet, RelatedSearchQuerySet
 import datetime
 from datetime import timedelta
@@ -151,27 +152,22 @@ class AppDashboardView (BaseDashboardMixin,
 class CouncilMembersView(views.TemplateView):
     template_name = 'councilmatic/councilmembers.html'
 
-    def get_councilmembers(self):
-        return phillyleg.models.CouncilMember.objects.\
-               filter(title__icontains='alderman').\
-               exclude(title__icontains='former').order_by('real_name')
+    def get_councilmember_groups(self):
+        cms = phillyleg.models.CouncilMember.objects.all().order_by('real_name')
 
-    def get_former_councilmembers(self):
-        return phillyleg.models.CouncilMember.objects.\
-               filter(title__icontains='former').\
-               order_by('real_name')
+        district_cms = filter(lambda cm: cm.is_active and not cm.is_at_large, cms)
+        at_large_cms = filter(lambda cm: cm.is_active and cm.is_at_large, cms)
+        former_cms = filter(lambda cm: not cm.is_active, cms)
 
-    def get_other_councilmembers(self):
-        return phillyleg.models.CouncilMember.objects.\
-               exclude(title__icontains='former').exclude(title__icontains='alderman').\
-               order_by('real_name')
-
+        return [
+            (_('District'), 'district', district_cms),
+            (_('At Largs'), 'at-large', at_large_cms),
+            (_('Former'), 'former', former_cms)
+        ]
 
     def get_context_data(self, **kwargs):
         context_data = super(CouncilMembersView, self).get_context_data(**kwargs)
-        context_data['councilmembers'] = self.get_councilmembers()
-        context_data['former_councilmembers'] = self.get_former_councilmembers()
-        context_data['other_councilmembers'] = self.get_other_councilmembers()
+        context_data['councilmember_groups'] = self.get_councilmember_groups()
         return context_data
 
 
