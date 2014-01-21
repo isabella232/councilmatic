@@ -27,7 +27,7 @@ markdown
 git+git://github.com/toastdriven/django-haystack.git#egg=django-haystack==2.0.0-beta
 
 # Using whoosh as the haystack (search) backend for now, for simplicity (it's
-# pure Python).  May use pysolr later, but may not need to.
+# pure Python).  Good for local or development deployments.
 whoosh==2.3.2
 
 # Using my version of pysolr until issue # is pulled, as DOTCLOUD's trailing
@@ -59,14 +59,6 @@ git+git://github.com/mwieler/django-registration-1.5.git#egg=django-registration
 
 # Requests, for talking HTTP to things like Google's geocoder
 requests==2.0.1
-
-# Scraping
-git+git://github.com/fgregg/legistar-scrape@5f04ebe7#egg=legistar-scrape
-BeautifulSoup
-BeautifulSoup4
-pdfminer
-slate
-git+https://github.com/abielr/mechanize.git#egg=mechanize
 
 
 # ====================

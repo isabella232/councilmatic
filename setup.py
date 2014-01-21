@@ -17,8 +17,6 @@ license = 'BSD'
 dependency_links = [
     'git+git://github.com/mjumbewu/pysolr.git@056f4e2d#egg=pysolr-3.0.6',
     'git+git://github.com/toastdriven/django-haystack.git@b9c9e47#egg=django-haystack-2.0.0',
-    'git+git://github.com/fgregg/legistar-scrape@5f04ebe7#egg=legistar-scrape-0.1',
-    'git+git://github.com/abielr/mechanize@813ba36#egg=mechanize-0.2.6',
 #    'https://bitbucket.org/ubernostrum/django-registration/get/default.tar.gz#egg=django-registration-dev',
     'git+git://github.com/mjumbewu/django-registration@a22ba5a#egg=django-registration-0.9.1-b1'
 ]
@@ -52,7 +50,7 @@ install_requires = [
 'django-haystack==2.0.0',
 
 # Using whoosh as the haystack (search) backend for now, for simplicity (it's
-# pure Python).  May use pysolr later, but may not need to.
+# pure Python).  Good choice for local or development deployments.
 'whoosh==2.3.2',
 
 # Using my version of pysolr until issue # is pulled, as DOTCLOUD's trailing
@@ -85,14 +83,6 @@ install_requires = [
 
 # Requests, for talking HTTP to things like Google's geocoder
 'requests==2.0.1',
-
-# Scraping
-'legistar-scrape==0.1',
-'BeautifulSoup',
-'BeautifulSoup4',
-'pdfminer',
-'slate',
-'mechanize',
 
 
 # ====================
