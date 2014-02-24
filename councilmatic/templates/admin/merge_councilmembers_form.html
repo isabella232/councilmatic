@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load admin_static admin_modify %}
+{% load i18n l10n %}
+{% load admin_urls %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_label|capfirst|escape }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% blocktrans %}Merge multiple {{ opts.verbose_name_plural|capfirst }}{% endblocktrans %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+  <div id="content-main">
+    <form action="" method="post">{% csrf_token %}
+      <p>Are you sure you want to merge the following council members?:</p>
+      <ul>
+        {% for member in objects %}
+        <li>{{ member }}
+          <ul>
+            <li>{{ member.aliases.all.count }} alias(es) ({% for alias in member.aliases.all %}{{ alias }}{% if not forloop.last %}, {% endif %}{% endfor %})</li>
+            <li>{{ member.legislation.all.count }} piece(s) of sponsored legislation (most recently on {{ member.legislation.all.0.intro_date }})</li>
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+      
+      {{ form }}
+
+      <div class="submit-row">
+        <input name="merge-action" type="submit" value="{% trans 'Merge' %}" class="default">
+      </div>
+    </form>
+  </div>
+
+{% endblock %}
