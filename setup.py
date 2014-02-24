@@ -90,7 +90,7 @@ install_requires = [
 # ====================
 'django-debug-toolbar==0.9.4',
 #pep8
-'django-nose==1.0',
+'django-nose==1.2',
 'coverage==3.5.1',
 'mock==0.8.0',
 
