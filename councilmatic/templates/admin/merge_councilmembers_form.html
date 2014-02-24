@@ -21,16 +21,20 @@
       <p>Are you sure you want to merge the following council members?:</p>
       <ul>
         {% for member in objects %}
-        <li>{{ member }}
+        <li style="clear: both;">
+          <img src="{{ STATIC_URL }}{{ member.headshot }}" style="float: right;"> {{ member }}
           <ul>
             <li>{{ member.aliases.all.count }} alias(es) ({% for alias in member.aliases.all %}{{ alias }}{% if not forloop.last %}, {% endif %}{% endfor %})</li>
             <li>{{ member.legislation.all.count }} piece(s) of sponsored legislation (most recently on {{ member.legislation.all.0.intro_date }})</li>
           </ul>
+          <hr>
         </li>
         {% endfor %}
       </ul>
       
-      {{ form }}
+      <div style="clear: both;">
+        {{ form }}
+      </div>
 
       <div class="submit-row">
         <input name="merge-action" type="submit" value="{% trans 'Merge' %}" class="default">
