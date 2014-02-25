@@ -30,6 +30,13 @@ urlpatterns = patterns(
     url(r'^admin/', admin.site.urls),
     url(r'^comments/', include('django.contrib.comments.urls')),
 
+    url(r'^robots.txt$',
+        TemplateView.as_view(template_name='robots.txt', content_type='text/plain'),
+        name='robots_txt'),
+    url(r'^sitemap.xml$',
+        views.SiteMapView.as_view(content_type='text/xml'),
+        name='sitemap_xml'),
+
     (r'^', include('registration.backends.default.urls')),
     url(r'^login/$', 'django.contrib.auth.views.login', name='registration_login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', name='registration_logout'),

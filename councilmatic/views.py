@@ -453,3 +453,12 @@ def legfile_choices(field):
     values = [(value_obj[field], value_obj[field])
           for value_obj in value_objs]
     return values
+
+
+class SiteMapView (views.TemplateView):
+    template_name = 'councilmatic/sitemap.xml'
+
+    def get_context_data(self, **kwargs):
+        kwargs['legfiles'] = LegFile.objects.all()
+        kwargs['councilmembers'] = CouncilMember.objects.all()
+        return super(SiteMapView, self).get_context_data(**kwargs)
