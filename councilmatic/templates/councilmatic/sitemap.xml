@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+   <url>
+      <loc>http://{{ request.get_host }}{% url 'main_dashboard' %}</loc>
+      <lastmod>{{ settings.LAST_DEPLOY_DATE|slice:":10" }}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>1.0</priority>
+   </url>
+
+   <url>
+      <loc>http://{{ request.get_host }}{% url 'search' %}</loc>
+      <lastmod>{{ settings.LAST_DEPLOY_DATE|slice:":10" }}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>1.0</priority>
+   </url>
+
+   <url>
+      <loc>http://{{ request.get_host }}{% url 'about' %}</loc>
+      <lastmod>{{ settings.LAST_DEPLOY_DATE|slice:":10" }}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>1.0</priority>
+   </url>
+
+   <url>
+      <loc>http://{{ request.get_host }}{% url 'councilmembers' %}</loc>
+      <lastmod>{{ settings.LAST_DEPLOY_DATE|slice:":10" }}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>1.0</priority>
+   </url>
+
+{% for legfile in legfiles %}
+   <url>
+      <loc>http://{{ request.get_host }}{% url 'legislation_detail' legfile.pk %}</loc>
+      <lastmod>{{ settings.LAST_DEPLOY_DATE|slice:":10" }}</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+   </url>
+{% endfor %}
+
+{% for member in councilmembers %}
+   <url>
+      <loc>http://{{ request.get_host }}{% url 'councilmember_detail' member.pk %}</loc>
+      <lastmod>{{ settings.LAST_DEPLOY_DATE|slice:":10" }}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+   </url>
+{% endfor %}
+
+</urlset>
