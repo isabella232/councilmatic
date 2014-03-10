@@ -7,9 +7,10 @@ from email.mime.text import MIMEText
 from logging import getLogger
 
 from django.contrib.sites.models import Site
+from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.manager import Manager
-from django.template import Context
+from django.template import Context, TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.encoding import smart_str, smart_unicode
 
@@ -273,12 +274,7 @@ class SubscriptionDispatcher (object):
 
         return content_changes
 
-    def render(self, subscriber, subscriptions, content_updates, library=None):
-        """
-        Render the given content updates to a template for the subscriber.
-        """
-        template = get_template(self.template_name)
-
+    def get_context_data(self, subscriber, subscriptions, content_updates, library=None, **kwargs):
         # I was having some trouble iterating over content_items as a dict
         # in the templates, so I'll just convert content updates to lists of
         # tuples.
@@ -290,6 +286,14 @@ class SubscriptionDispatcher (object):
                            'subscriptions': subscriptions,
                            'content_updates':content_updates,
                            'SITE': Site.objects.get_current()})
+        return context
+
+    def render(self, subscriber, subscriptions, content_updates, library=None):
+        """
+        Render the given content updates to a template for the subscriber.
+        """
+        template = get_template(self.template_name)
+        context = self.get_context_data(subscriber, subscriptions, content_updates, library)
         return template.render(context)
 
     def deliver_to(self, subscriber, delivery_text):
@@ -346,22 +350,54 @@ class SubscriptionDispatcher (object):
 
 class SubscriptionEmailer (SubscriptionDispatcher):
     template_name = 'subscriptions/subscription_email.txt'
+    html_template_name = 'subscriptions/subscription_email.html'
     EMAIL_TITLE = "Councilmatic %(date)s"
 
-    def send_email(self, you, emailbody, emailsubject=None):
-        from django.core.mail import send_mail
-
+    def send_email(self, you, emailbodies, emailsubject=None):
         subject = emailsubject or self.EMAIL_TITLE % {'date': date.today()}
-        message = emailbody
+        message = emailbodies['text']
+        html_message = emailbodies['html']
         from_email = 'admin@councilmatic.org'
         recipient_list = [you]
 
-        send_mail(subject, message, from_email, recipient_list)
+        # NOTE: In Django 1.7+, send_mail can handle multi-part email with the
+        # html_message parameter, but pre 1.7 cannot and we must construct the
+        # multipart message manually.
+        msg = EmailMultiAlternatives(
+            subject,
+            message,
+            from_email,
+            to=recipient_list)#,
+            # connection=connection)
 
-    def deliver_to(self, subscriber, delivery_text):
+        if html_message:
+            msg.attach_alternative(html_message, 'text/html')
+
+        msg.send()
+
+    def deliver_to(self, subscriber, delivery):
         """
         Send an email to the subscriber with the delivery_text
         """
         email_addr = subscriber.email
-        email_body = delivery_text
+        email_body = delivery
         self.send_email(email_addr, email_body)
+
+    def render(self, subscriber, subscriptions, content_updates, library=None):
+        """
+        Override the base render to render both text and html versions, if
+        available.
+        """
+        text_template = get_template(self.template_name)
+
+        try:
+            html_template = get_template(self.html_template_name)
+        except TemplateDoesNotExist:
+            html_template = None
+
+        context = self.get_context_data(subscriber, subscriptions, content_updates, library)
+        return {
+            'text': text_template.render(context),
+            'html': html_template.render(context) if html_template else None
+        }
+

@@ -189,6 +189,8 @@ class SearchResultsFeed (ContentFeed):
         return qs.order_by('order_date')
 
     def get_changes_to(self, item, datetime):
+        if item.object is None: return {}, item.order_date
+
         if item.model_name == 'legfile':
             return {'Title': item.object.title}, item.order_date
         elif item.model_name == 'legminutes':
