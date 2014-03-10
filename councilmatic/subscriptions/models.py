@@ -144,7 +144,7 @@ class Subscriber (User):
 
             other_params = [(p.name, p.value) for p in record.feed_params.all()]
             for sub in subs:
-                self_params = other_params[:]
+                self_params = [(p.name, p.value) for p in sub.feed_record.feed_params.all()]
                 log.debug('Checking parameters %r against %r' %
                           (self_params, other_params))
                 if self_params == other_params:
