@@ -48,6 +48,8 @@ class WordAdmin (admin.ModelAdmin):
 class LocationAdmin (admin.OSMGeoAdmin):
     model = MetaData_Location
     list_display = ['__unicode__', 'valid']
+    list_editable = ['valid']
+    list_filter = ['valid']
     search_fields = ['matched_text', 'address']
     readonly_fields = ['legfiles']
 
