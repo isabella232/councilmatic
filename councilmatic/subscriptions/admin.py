@@ -31,14 +31,18 @@ class SubscriptionDispatchRecordInline(admin.TabularInline):
     extra = 0
 
 class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['__unicode__', 'last_sent']
     inlines = [SubscriptionDispatchRecordInline]
     
     def queryset(self, request):
         return models.Subscription.objects.select_related('feed_record').prefetch_related('feed_record__feed_params')
 
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ['username', 'date_joined', 'last_login']
+
 
 admin.site.register(models.Subscription, SubscriptionAdmin)
-admin.site.register(models.Subscriber)
+admin.site.register(models.Subscriber, SubscriberAdmin)
 admin.site.register(models.ContentFeedRecord, ContentFeedRecordAdmin)
 
 #admin.site.register(models.SearchSubscription)
