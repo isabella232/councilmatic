@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import date, time, datetime
+from django.http import QueryDict
 from collections import defaultdict
 from itertools import chain
 from itertools import product
@@ -151,7 +152,9 @@ class SearchResultsFeed (ContentFeed):
         specific.  Just keep that in mind.
 
         """
-        if isinstance(search_filter, dict):
+        if isinstance(search_filter, QueryDict):
+            self.filter = dict((key, lval) for key, lval in search_filter.iterlists())
+        elif isinstance(search_filter, dict):
             self.filter = search_filter
         elif search_filter is not None:
             self.filter = json.loads(search_filter)
@@ -215,9 +218,15 @@ class SearchResultsFeed (ContentFeed):
 
         label += 'legislation'
 
-        if 'q' in self.filter:
-            is_plural = (' ' in self.filter['q'])
-            label += ' containing the keyword' + ('s' if is_plural else '') + ' "' + self.filter['q'] + '"'
+        if 'q' in self.filter and self.filter['q']:
+            keywords = self.filter['q'][0]
+            if keywords:
+                is_plural = (' ' in keywords)
+                label += ' containing the keyword' + ('s' if is_plural else '') + ' "' + keywords + '"'
+
+        if 'topics' in self.filter:
+            is_plural = (len(self.filter['topics']) > 1)
+            label += ' with the topic' + ('s ' if is_plural else ' ') + ' or '.join(self.filter['topics'])
 
         if 'sponsors' in self.filter:
             label += ' sponsored by ' + ' or '.join(self.filter['sponsors'])
