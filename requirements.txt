@@ -24,16 +24,13 @@ markdown
 # ====================
 # Search
 # ====================
-git+git://github.com/toastdriven/django-haystack.git#egg=django-haystack==2.0.0-beta
+django-haystack==2.0.0
 
 # Using whoosh as the haystack (search) backend for now, for simplicity (it's
 # pure Python).  Good for local or development deployments.
 whoosh==2.3.2
 
-# Using my version of pysolr until issue # is pulled, as DOTCLOUD's trailing
-# slash on SOLR url breaks pysolr.
-#pysolr==3.0.4
-git+git://github.com/mjumbewu/pysolr.git#egg=pysolr==3.0.5
+pysolr==3.0.6
 
 
 
@@ -50,7 +47,7 @@ slimit==0.7.4
 # ====================
 # Registration!
 # ====================
-git+git://github.com/mwieler/django-registration-1.5.git#egg=django-registration
+django-registration==1.0
 
 
 # ====================
