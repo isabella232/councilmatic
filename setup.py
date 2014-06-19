@@ -16,7 +16,6 @@ author_email = 'mjumbewu@gmail.com'
 license = 'BSD'
 dependency_links = [
     'git+git://github.com/mjumbewu/pysolr.git@056f4e2d#egg=pysolr-3.0.6',
-    'git+git://github.com/toastdriven/django-haystack.git@b9c9e47#egg=django-haystack-2.0.0',
 #    'https://bitbucket.org/ubernostrum/django-registration/get/default.tar.gz#egg=django-registration-dev',
     'git+git://github.com/mjumbewu/django-registration@a22ba5a#egg=django-registration-0.9.1-b1'
 ]

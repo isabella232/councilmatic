@@ -24,7 +24,7 @@ markdown
 # ====================
 # Search
 # ====================
-git+git://github.com/toastdriven/django-haystack.git@v2.0.0#egg=django-haystack==2.0.0
+django-haystack==2.0.0
 
 # Using whoosh as the haystack (search) backend for now, for simplicity (it's
 # pure Python).  Good for local or development deployments.
