@@ -15,7 +15,6 @@ author = 'Mjumbe Wawatu Ukweli'
 author_email = 'mjumbewu@gmail.com'
 license = 'BSD'
 dependency_links = [
-    'git+git://github.com/mjumbewu/pysolr.git@056f4e2d#egg=pysolr-3.0.6',
 #    'https://bitbucket.org/ubernostrum/django-registration/get/default.tar.gz#egg=django-registration-dev',
     'git+git://github.com/mjumbewu/django-registration@a22ba5a#egg=django-registration-0.9.1-b1'
 ]
@@ -52,9 +51,6 @@ install_requires = [
 # pure Python).  Good choice for local or development deployments.
 'whoosh==2.3.2',
 
-# Using my version of pysolr until issue # is pulled, as DOTCLOUD's trailing
-# slash on SOLR url breaks pysolr.
-#pysolr==3.0.4
 'pysolr==3.0.6',
 
 
